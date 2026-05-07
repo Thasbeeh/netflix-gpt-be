@@ -53,11 +53,7 @@ export class AuthService {
         email,
         hashedPassword,
       );
-      const payload = { email: user.email, sub: user.id };
-      return {
-        access_token: this.tokenService.generateAccessToken(payload),
-        user: { displayName, email },
-      };
+      return this.login(user);
     } catch (error) {
       if (error.code === 'P2002') {
         throw new ConflictException('Email already exists');

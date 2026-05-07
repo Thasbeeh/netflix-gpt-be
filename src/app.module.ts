@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { MoviesModule } from './movies/movies.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     UsersModule,
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    MoviesModule,
   ],
   controllers: [AppController],
   providers: [

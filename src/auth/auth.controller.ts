@@ -3,7 +3,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { Public } from 'src/decorators/public.decorator';
 import SignUpDto from './dtos/sign-up.dto';
-import type { Response, Request } from 'express';
+import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import RefreshTokenGuard from './guards/refresh-token.guard';
 import type { AuthenticatedRequest } from './types/auth-request.type';
@@ -33,16 +33,29 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { access_token: accessToken, user: updatedUser };
+    return { accessToken: accessToken, user: updatedUser };
   }
 
   @Post('/signup')
-  createUser(@Body() body: SignUpDto) {
-    return this.authService.createUser(
-      body.displayName,
-      body.email,
-      body.password,
-    );
+  async createUser(
+    @Body() body: SignUpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken, updatedUser } =
+      await this.authService.createUser(
+        body.displayName,
+        body.email,
+        body.password,
+      );
+
+    res.cookie('rt', refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { accessToken: accessToken, user: updatedUser };
   }
 
   @UseGuards(RefreshTokenGuard)
@@ -61,7 +74,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return { access_token: accessToken, user: dbUser };
+    return { accessToken: accessToken, user: dbUser };
   }
 
   @UseGuards(RefreshTokenGuard)

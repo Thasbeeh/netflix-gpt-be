@@ -8,3 +8,10 @@
 - login
 - Refresh
 - Logout
+- Installed axios and registered HTTP Module
+- Fetch movies using TMDB API
+- Fetch Trailer video using Movie id
+
+# Notes
+
+- firstValueFrom: covert rxjs(stream of data) to promise(single data)
