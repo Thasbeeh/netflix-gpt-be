@@ -5,13 +5,13 @@ import { MoviesService } from './movies.service';
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
-  @Get()
+  @Get('/main')
   getNowPlayingMovies() {
-    return this.moviesService.getMovies();
+    return this.moviesService.getNowPlayingMovies();
   }
 
-  @Get(':id')
-  getMovieTrailerVideo(@Param('id', ParseIntPipe) id: number) {
-    return this.moviesService.getMovieTrailerVideo(id);
+  @Get('/sections')
+  getMovieSections() {
+    return this.moviesService.getAggregatedMoviesList();
   }
 }

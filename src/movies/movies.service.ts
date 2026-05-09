@@ -1,82 +1,58 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { isAxiosError } from 'axios';
-import { firstValueFrom } from 'rxjs';
+import { Injectable } from '@nestjs/common';
 import TMDBVideo from './types/tmdb-video.type';
+import { TmbdService } from './tmbd.service';
 
 @Injectable()
 export class MoviesService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly tmdbService: TmbdService) {}
 
-  async getMovies() {
-    const tmdb_aT = this.configService.get<String>('TMDB_ACCESS_TOKEN');
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${tmdb_aT}`,
-      },
-    };
-    try {
-      const url = this.configService.get<string>('TMDB_MOVIES_BASE_URL');
-      const response = await firstValueFrom(
-        this.httpService.get(url + 'now_playing?page=1', options),
-      );
-      return response.data.results;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        throw new InternalServerErrorException(
-          error.response?.data?.status_message || 'Failed to fetch movies',
-        );
-      }
+  async getNowPlayingMovies() {
+    const nowPlayingMovies = await this.tmdbService.getMovies('now_playing');
 
-      console.error('Unexpected Error:', error);
-      throw error;
+    if (!nowPlayingMovies?.length) {
+      return { nowPlayingMovies: [], trailerVideo: null };
     }
-  }
 
-  async getMovieTrailerVideo(id: number) {
-    const tmdb_aT = this.configService.get<String>('TMDB_ACCESS_TOKEN');
-    const url = this.configService.get<string>('TMDB_MOVIES_BASE_URL');
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${tmdb_aT}`,
-      },
-    };
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(url + `${id}/videos?language=en-US`, options),
-      );
-      const videos: TMDBVideo[] = response?.data?.results;
-      let trailerVideo = videos.find((video) => video.type === 'Trailer');
-      if (!trailerVideo && videos.length > 0) trailerVideo = videos[0];
+    const mainMovie = nowPlayingMovies[3];
+    const mainMovieVideos: TMDBVideo[] = await this.tmdbService.getMovies(
+      `${mainMovie.id}/videos?language=en-US`,
+    );
 
-      return trailerVideo
+    const trailer =
+      mainMovieVideos.find((video) => video.type === 'Trailer') ??
+      mainMovieVideos[0];
+
+    return {
+      nowPlayingMovies,
+      trailerVideo: trailer
         ? {
-            key: trailerVideo.key,
-            site: trailerVideo.site,
-            name: trailerVideo.name,
+            key: trailer.key,
+            site: trailer.site,
+            name: trailer.name,
             url:
-              trailerVideo.site === 'YouTube'
-                ? `https://www.youtube.com/watch?v=${trailerVideo.key}`
+              trailer.site === 'YouTube'
+                ? `https://www.youtube.com/watch?v=${trailer.key}`
                 : null,
           }
-        : null;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        throw new InternalServerErrorException(
-          error.response?.data?.status_message || 'Failed to fetch movies',
-        );
-      }
+        : null,
+    };
+  }
 
-      console.error('Unexpected Error:', error);
-      throw error;
-    }
+  async getAggregatedMoviesList() {
+    const [upcomingMovies, topRatedMovies, popularMovies] =
+      await Promise.allSettled([
+        this.tmdbService.getMovies('upcoming'),
+        this.tmdbService.getMovies('top_rated'),
+        this.tmdbService.getMovies('popular'),
+      ]);
+
+    return {
+      upcomingMovies:
+        upcomingMovies.status === 'fulfilled' ? upcomingMovies.value : null,
+      topRatedMovies:
+        topRatedMovies.status === 'fulfilled' ? topRatedMovies.value : null,
+      popularMovies:
+        popularMovies.status === 'fulfilled' ? popularMovies.value : null,
+    };
   }
 }

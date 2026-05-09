@@ -3,19 +3,20 @@ import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TmbdService } from './tmbd.service';
 
 @Module({
   imports: [
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        timeout: configService.get<number>('HTTP_TIMEOUT') || 5000,
-        maxRedirects: configService.get<number>('HTTP_MAX_REDIRECTS') || 5,
+        timeout: Number(configService.get('HTTP_TIMEOUT')) || 5000,
+        maxRedirects: Number(configService.get('HTTP_MAX_REDIRECTS')) || 5,
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [MoviesController],
-  providers: [MoviesService],
+  providers: [MoviesService, TmbdService],
 })
 export class MoviesModule {}
