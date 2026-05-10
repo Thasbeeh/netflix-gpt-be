@@ -26,13 +26,13 @@ export class TmbdService {
       this.configService.getOrThrow<string>('TMDB_ACCESS_TOKEN');
   }
 
-  async getMovies(category: string, page = 1) {
+  async getMovies(contentUrl: string, params: any) {
+    const config = this.getHeaders();
+    config.params = params;
+
     try {
       const response: AxiosResponse = await firstValueFrom(
-        this.httpService.get(
-          this.baseUrl + category + '?page=' + page,
-          this.getHeaders(),
-        ),
+        this.httpService.get(this.baseUrl + contentUrl, config),
       );
       return response.data.results;
     } catch (error) {

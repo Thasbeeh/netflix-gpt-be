@@ -1,21 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import TMDBVideo from './types/tmdb-video.type';
 import { TmbdService } from './tmbd.service';
+import { FamilyFilterService } from './family-filter.service';
 
 @Injectable()
 export class MoviesService {
-  constructor(private readonly tmdbService: TmbdService) {}
+  constructor(
+    private readonly tmdbService: TmbdService,
+    private readonly familyFilterService: FamilyFilterService,
+  ) {}
 
   async getNowPlayingMovies() {
-    const nowPlayingMovies = await this.tmdbService.getMovies('now_playing');
+    const nowPlayingMovies = await this.tmdbService.getMovies(
+      'discover/movie',
+      this.familyFilterService.categoryFilterParams('now_playing'),
+    );
 
-    if (!nowPlayingMovies?.length) {
+    if (!nowPlayingMovies?.length)
       return { nowPlayingMovies: [], trailerVideo: null };
-    }
 
-    const mainMovie = nowPlayingMovies[3];
+    const mainMovie = nowPlayingMovies[0];
     const mainMovieVideos: TMDBVideo[] = await this.tmdbService.getMovies(
-      `${mainMovie.id}/videos?language=en-US`,
+      `movie/${mainMovie.id}/videos`,
+      { language: 'en-US' },
     );
 
     const trailer =
@@ -39,11 +46,22 @@ export class MoviesService {
   }
 
   async getAggregatedMoviesList() {
+    const url = 'discover/movie';
+
     const [upcomingMovies, topRatedMovies, popularMovies] =
       await Promise.allSettled([
-        this.tmdbService.getMovies('upcoming'),
-        this.tmdbService.getMovies('top_rated'),
-        this.tmdbService.getMovies('popular'),
+        this.tmdbService.getMovies(
+          url,
+          this.familyFilterService.categoryFilterParams('upcoming'),
+        ),
+        this.tmdbService.getMovies(
+          url,
+          this.familyFilterService.categoryFilterParams('top_rated'),
+        ),
+        this.tmdbService.getMovies(
+          url,
+          this.familyFilterService.categoryFilterParams('popular'),
+        ),
       ]);
 
     return {

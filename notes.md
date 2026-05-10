@@ -13,6 +13,8 @@
 - Fetch Trailer video using Movie id
 - Central service to fetch data from tmdb
 - Fetch Popular, trending, top rated movies
+- Identify genre ids for moderation
+- Family friendly content moderation service and made custom url with filter params
 
 # Notes
 

@@ -4,6 +4,7 @@ import { MoviesService } from './movies.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TmbdService } from './tmbd.service';
+import { FamilyFilterService } from './family-filter.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { TmbdService } from './tmbd.service';
     }),
   ],
   controllers: [MoviesController],
-  providers: [MoviesService, TmbdService],
+  providers: [MoviesService, TmbdService, FamilyFilterService],
 })
 export class MoviesModule {}
