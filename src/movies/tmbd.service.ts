@@ -34,7 +34,7 @@ export class TmbdService {
       const response: AxiosResponse = await firstValueFrom(
         this.httpService.get(this.baseUrl + contentUrl, config),
       );
-      return response.data.results;
+      return response.data;
     } catch (error) {
       this.handleAxiosError(error);
     }

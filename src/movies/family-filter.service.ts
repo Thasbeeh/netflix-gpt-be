@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FamilyFilterService {
-  categoryFilterParams(category: string) {
+  categoryFilterParams(category: string, page: number) {
     const categoryFilters: Record<string, string | number | boolean> = {};
 
     const todayObj = new Date();
@@ -18,8 +18,9 @@ export class FamilyFilterService {
     categoryFilters['include_adult'] = false;
     categoryFilters['certification_country'] = 'US';
     categoryFilters['certification.lte'] = 'PG';
-    categoryFilters['with_genres'] = '10751,16'; // family, animation
+    categoryFilters['with_genres'] = '10751|16'; // family, animation
     // categoryFilters['without_genres'] = '53,27,80,10749'; // horror, drama, crime, thriller
+    categoryFilters['page'] = page || 1;
 
     if (category === 'now_playing') {
       categoryFilters['release_date.gte'] = eightWeeksAgo;

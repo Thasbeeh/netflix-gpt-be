@@ -10,7 +10,7 @@
 - Logout
 - Installed axios and registered HTTP Module
 - Fetch Now playing movies using TMDB API
-- Fetch Trailer video using Movie id
+- Fetch Trailer video using Movie id with retry mechanism
 - Central service to fetch data from tmdb
 - Fetch Popular, trending, top rated movies
 - Identify genre ids for moderation
