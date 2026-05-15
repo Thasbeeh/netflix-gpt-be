@@ -1,5 +1,14 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { MoviesService } from './movies.service';
+import MessageDto from 'src/ai/message.dto';
 
 @Controller('movies')
 export class MoviesController {

@@ -118,4 +118,17 @@ export class MoviesService {
       return await fn(); // retry one more time
     }
   }
+
+  async getMovie(originalTitle: string, primary_release_year: number) {
+    const { results, ...pageInfo }: MoviesType =
+      await this.tmdbService.getMovies('search/movie', {
+        query: originalTitle,
+        primary_release_year,
+        include_adult: 'false',
+        language: 'en-US',
+        page: '1',
+      });
+
+    return results.length > 0 ? results[0] : null;
+  }
 }

@@ -19,5 +19,6 @@ import { FamilyFilterService } from './family-filter.service';
   ],
   controllers: [MoviesController],
   providers: [MoviesService, TmbdService, FamilyFilterService],
+  exports: [MoviesService],
 })
 export class MoviesModule {}

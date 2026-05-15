@@ -15,6 +15,7 @@
 - Fetch Popular, trending, top rated movies
 - Identify genre ids for moderation
 - Family friendly content moderation service and made custom url with filter params
+- Integrated Groq API and TMDB for AI enabled search
 
 # Notes
 

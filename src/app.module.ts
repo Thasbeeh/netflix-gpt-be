@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { MoviesModule } from './movies/movies.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MoviesModule } from './movies/movies.module';
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MoviesModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [
